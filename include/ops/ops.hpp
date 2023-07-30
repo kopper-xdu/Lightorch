@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 
 template<typename Dtype>
 class Tensor;
@@ -16,12 +17,16 @@ class Tensor;
 //     void blank()
 // };
 
+#define DECLARE_BACKWARD \
+static void backward(const std::vector<const Tensor<Dtype> *> &inputs, \
+                     const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs);
+
 template<typename Dtype>
 class AddOps
 {
 public:
     static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    static void backward(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &grad_a, Tensor<Dtype> &grad_b);
+    DECLARE_BACKWARD
 };
 
 template<typename Dtype>
@@ -29,7 +34,7 @@ class SubOps
 {
 public:
     static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    static void backward(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &grad_a, Tensor<Dtype> &grad_b);
+    DECLARE_BACKWARD
 };
 
 template<typename Dtype>
@@ -37,7 +42,7 @@ class MulOps
 {
 public:
     static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    static void backward(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &grad_a, Tensor<Dtype> &grad_b);
+    DECLARE_BACKWARD
 };
 
 template<typename Dtype>
@@ -45,7 +50,15 @@ class DivOps
 {
 public:
     static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    static void backward(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &grad_a, Tensor<Dtype> &grad_b);
+    DECLARE_BACKWARD
+};
+
+template<typename Dtype>
+class MeanOps
+{
+public:
+    static void compute(const Tensor<Dtype> &a, Tensor<Dtype> &out);
+    DECLARE_BACKWARD
 };
 
 

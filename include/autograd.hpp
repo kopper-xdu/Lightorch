@@ -4,6 +4,8 @@
 // #include "tensor.hpp"
 #include <string>
 #include <vector>
+#include <functional>
+#include <memory>
 
 template<typename Dtype>
 class Tensor;
@@ -16,8 +18,9 @@ public:
     std::vector<const Tensor<Dtype> *> inputs;
     std::string ops_name;
 
-    using bwd_ptr = void (*)(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &grad_a, Tensor<Dtype> &grad_b);
+    using bwd_ptr = void (*)(const std::vector<const Tensor<Dtype> *> &inputs, const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs);
     bwd_ptr ops_backward;
+    // std::function<void()> ops_backward;
 };
 
 #endif

@@ -24,6 +24,8 @@ public:
     Tensor operator-(const Tensor &another) const;
     Tensor operator*(const Tensor &another) const;
     Tensor operator/(const Tensor &another) const;
+    Tensor mean() const;
+
 
     void backward();
 

@@ -10,3 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_executable(test test.cpp src/tensor.cpp src/autograd.cpp src/ops/ops.cpp)
 
 target_include_directories(test PUBLIC include)
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(test PUBLIC OpenMP::OpenMP_CXX)
+endif()

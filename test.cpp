@@ -1,20 +1,19 @@
 #include <iostream>
-#include "tensor.hpp"
 #include <vector>
+#include "tensor.hpp"
 
-
-int main()
-{
-    Tensor<float> a({1});
+int main() {
+    Tensor<float> a({10});
     a[0] = 5;
-    Tensor<float> b({1});
+    Tensor<float> b({10});
     b[0] = 10;
-    Tensor<float> d({1});
+    Tensor<float> d({10});
     d[0] = 3;
 
     auto c = a + b;
     auto e = c * d;
-    std::cout << e[0] << std::endl;
+    auto m = e.mean();
+    std::cout << m[0] << std::endl;
 
     e.backward();
 

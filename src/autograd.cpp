@@ -9,7 +9,15 @@ void Functionality<Dtype>::calc_grad(const Tensor<Dtype> &multiply_grad) const
 {
     if (this->inputs.size() == 0)
         return ;
-    this->ops_backward(*(this->inputs[0]), *(this->inputs[1]), *(this->inputs[0]->grad), *(this->inputs[1]->grad));
+    // this->ops_backward(*(this->inputs[0]), *(this->inputs[1]), *(this->inputs[0]->grad), *(this->inputs[1]->grad));
+    
+    std::vector<std::shared_ptr<Tensor<Dtype>>> outputs;
+    for (auto input : this->inputs)
+    {
+        outputs.push_back(input->grad);
+    }
+    this->ops_backward(this->inputs, outputs);
+
 
     for (auto input : this->inputs)
     {

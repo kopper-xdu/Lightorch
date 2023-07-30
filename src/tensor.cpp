@@ -6,7 +6,6 @@ template<typename Dtype>
 Tensor<Dtype>::Tensor(const std::vector<uint32_t> &shape, bool require_grad) :
     shape(shape), 
     require_grad(require_grad)
-    // data(new Storage())
 {
     auto mem_size = sizeof(Dtype);
     for (auto x : shape)
@@ -30,7 +29,6 @@ Tensor<Dtype> Tensor<Dtype>::ones(std::vector<uint32_t> shape)
 template<typename Dtype>
 void Tensor<Dtype>::backward()
 {
-    // this->grad->data;
     (*(this->grad))[0] = 1;
     this->grad_fn.calc_grad(*(this->grad));
 }
@@ -105,6 +103,19 @@ Tensor<Dtype> Tensor<Dtype>::operator/(const Tensor &another) const
     res.grad_fn.inputs.push_back(&another);
     res.grad_fn.ops_name = "Div";
     res.grad_fn.ops_backward = &DivOps<Dtype>::backward;
+
+    return res;
+}
+
+template<typename Dtype>
+Tensor<Dtype> Tensor<Dtype>::mean() const
+{
+    Tensor<Dtype> res({1});
+    MeanOps<Dtype>::compute(*this, res);
+
+    res.grad_fn.inputs.push_back(this);
+    res.grad_fn.ops_name = "Mean";
+    res.grad_fn.ops_backward = &MeanOps<Dtype>::backward;
 
     return res;
 }
