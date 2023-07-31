@@ -1,5 +1,4 @@
-#ifndef TENSOR_HPP_
-#define TENSOR_HPP_
+#pragma once
 
 #include <vector>
 #include <iostream>
@@ -42,5 +41,3 @@ public:
 
 template<typename Dtype>
 std::ostream& operator<<(std::ostream& out, Tensor<Dtype> tensor);
-
-#endif

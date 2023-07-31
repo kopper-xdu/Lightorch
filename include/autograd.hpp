@@ -1,7 +1,5 @@
-#ifndef AUTOGRAD
-#define AUTOGRAD
+#pragma once
 
-// #include "tensor.hpp"
 #include <string>
 #include <vector>
 #include <functional>
@@ -22,5 +20,3 @@ public:
     bwd_ptr ops_backward;
     // std::function<void()> ops_backward;
 };
-
-#endif

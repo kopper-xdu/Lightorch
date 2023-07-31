@@ -1,5 +1,4 @@
-#ifndef MODULE
-#define MODULE
+#pragma once
 
 #include <vector>
 #include <cstdint>
@@ -29,6 +28,3 @@ public:
 
     int a = 0;
 };
-
-#endif
-
