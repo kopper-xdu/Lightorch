@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "tensor.hpp"
+#include <spdlog/spdlog.h>
 
 int main() {
     Tensor<float> a({10});

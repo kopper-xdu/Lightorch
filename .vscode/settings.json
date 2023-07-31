@@ -46,5 +46,10 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp"
-    }
+    },
+
+    // "cmake.configureSettings": {
+    //     "CMAKE_TOOLCHAIN_FILE": "C:/Dev/vcpkg/scripts/buildsystems/vcpkg.cmake",
+    //     "VCPKG_TARGET_TRIPLET": "x64-mingw-static"
+    // },
 }
