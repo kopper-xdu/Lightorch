@@ -6,13 +6,9 @@
 class Storage
 {
 public:
-    Storage(uint32_t size) : data(malloc(size)) { }
-    // Storage(const std::vector<uint32_t> &shape, uint32_t size) 
-    // { 
+    Storage(uint32_t size) : start_ptr_(malloc(size)) { }
 
-    // }
+    ~Storage() { free(start_ptr_); }
 
-    ~Storage() { free(data); }
-
-    void *data;
+    void *start_ptr_;
 };

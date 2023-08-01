@@ -1,65 +1,42 @@
-#ifndef OPS
-#define OPS
+# pragma once
 
 #include <vector>
-#include <map>
+#include <array>
 #include <memory>
 
 template<typename Dtype>
 class Tensor;
 
-// template<typename Dtype>
-// class Ops
-// {
-// public:
-//     // virtual Tensor<Dtype> compute(Tensor<Dtype> a, Tensor<Dtype> b) = 0;
-//     // virtual Tensor<Dtype> grad() = 0;
-//     void blank()
-// };
+#define DECLARE_COMPUTE(num) \
+static void compute(const std::vector<const Tensor<Dtype> *> &inputs, \
+                    Tensor<Dtype> &out);
 
-#define DECLARE_BACKWARD \
+#define DECLARE_BACKWARD(num) \
 static void backward(const std::vector<const Tensor<Dtype> *> &inputs, \
                      const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs);
 
-template<typename Dtype>
-class AddOps
-{
-public:
-    static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    DECLARE_BACKWARD
+#define DECLARE_OPS(ops_name, num) \
+template<typename Dtype> \
+class ops_name##Ops \
+{ \
+public: \
+    DECLARE_COMPUTE(num) \
+    DECLARE_BACKWARD(num) \
 };
 
-template<typename Dtype>
-class SubOps
-{
-public:
-    static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    DECLARE_BACKWARD
-};
+DECLARE_OPS(Add, 2)
+DECLARE_OPS(Sub, 2)
+DECLARE_OPS(Mul, 2)
+DECLARE_OPS(Div, 2)
+DECLARE_OPS(Mean, 1)
 
-template<typename Dtype>
-class MulOps
-{
-public:
-    static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    DECLARE_BACKWARD
-};
 
 template<typename Dtype>
-class DivOps
+class SliceOps
 {
 public:
-    static void compute(const Tensor<Dtype> &a, const Tensor<Dtype> &b, Tensor<Dtype> &out);
-    DECLARE_BACKWARD
+    DECLARE_COMPUTE(1)
+    DECLARE_BACKWARD(1)
+
+    const std::vector<std::pair<uint32_t, uint32_t>> ranges;
 };
-
-template<typename Dtype>
-class MeanOps
-{
-public:
-    static void compute(const Tensor<Dtype> &a, Tensor<Dtype> &out);
-    DECLARE_BACKWARD
-};
-
-
-#endif

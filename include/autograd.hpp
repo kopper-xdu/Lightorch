@@ -16,7 +16,7 @@ public:
     std::vector<const Tensor<Dtype> *> inputs;
     std::string ops_name;
 
-    using bwd_ptr = void (*)(const std::vector<const Tensor<Dtype> *> &inputs, const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs);
-    bwd_ptr ops_backward;
-    // std::function<void()> ops_backward;
+    using bwd_func = std::function<void(const std::vector<const Tensor<Dtype> *> &inputs,
+                                        const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs)>;
+    bwd_func ops_backward;
 };

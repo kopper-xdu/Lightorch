@@ -3,26 +3,29 @@
 #include "tensor.hpp"
 #include "common.hpp"
 #include <vector>
+#include <iostream>
 
 template<typename Dtype>
 void Functionality<Dtype>::calc_grad(const Tensor<Dtype> &multiply_grad) const
 {
-    if (this->inputs.size() == 0)
+    if (inputs.size() == 0)
         return ;
     // this->ops_backward(*(this->inputs[0]), *(this->inputs[1]), *(this->inputs[0]->grad), *(this->inputs[1]->grad));
     
     std::vector<std::shared_ptr<Tensor<Dtype>>> outputs;
-    for (auto input : this->inputs)
+    for (auto input : inputs)
     {
-        outputs.push_back(input->grad);
+        outputs.push_back(input->grad_);
     }
-    this->ops_backward(this->inputs, outputs);
 
+    // std::forward(inputs, outputs);
+    // std::forward(outputs);
+    ops_backward(inputs, outputs);
 
-    for (auto input : this->inputs)
+    for (auto input : inputs)
     {
-        *(input->grad) = *(input->grad) * multiply_grad;
-        input->grad_fn.calc_grad(*(input->grad));
+        *(input->grad_) = *(input->grad_) * multiply_grad;
+        input->grad_fn_.calc_grad(*(input->grad_));
     }
 
 }
