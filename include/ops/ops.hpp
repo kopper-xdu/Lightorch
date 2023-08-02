@@ -35,8 +35,10 @@ template<typename Dtype>
 class SliceOps
 {
 public:
-    DECLARE_COMPUTE(1)
-    DECLARE_BACKWARD(1)
-
-    const std::vector<std::pair<uint32_t, uint32_t>> ranges;
+    static void compute(const std::vector<const Tensor<Dtype> *> &inputs, \
+                        Tensor<Dtype> &out,
+                        const std::vector<std::pair<uint32_t, uint32_t>> &ranges);
+    static void backward(const std::vector<const Tensor<Dtype> *> &inputs,
+                         const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs,
+                         const std::vector<std::pair<uint32_t, uint32_t>> ranges);
 };

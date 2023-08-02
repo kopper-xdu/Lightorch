@@ -13,10 +13,12 @@ template<typename Dtype>
 class Tensor
 {
 public:
-    Tensor(const std::vector<uint32_t> &shape, bool require_grad = true);
+    Tensor(const std::vector<uint32_t> &shape, bool require_grad = true, bool alloc_mem = true);
 
     // Tensor slice(const std::vector<std::pair<uint32_t, uint32_t>>& ranges) const;
-    Dtype& operator[](uint32_t idx) const;
+    Dtype item() const;
+    Tensor operator=(Dtype val) const;
+    Tensor operator[](uint32_t idx) const;
     Tensor operator+(const Tensor &another) const;
     Tensor operator-(const Tensor &another) const;
     Tensor operator*(const Tensor &another) const;

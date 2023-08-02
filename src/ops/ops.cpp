@@ -172,6 +172,30 @@ IMPLEMENT_BACKWARD(Mean)
     }
 }
 
+template<typename Dtype>
+void SliceOps<Dtype>::compute(const std::vector<const Tensor<Dtype> *> &inputs,
+                              Tensor<Dtype> &out,
+                              const std::vector<std::pair<uint32_t, uint32_t>> &ranges)
+{
+    auto a = (Dtype *) inputs[0]->data_->start_ptr_;
+    auto o = (Dtype *) out.data_->start_ptr_;
+
+    uint32_t length = out->length_;
+
+    # pragma omp parallel for
+    for (int i = 0; i < length; ++i)
+    {
+        // o[i] = ;
+    }
+}
+
+template<typename Dtype>
+void SliceOps<Dtype>::backward(const std::vector<const Tensor<Dtype> *> &inputs,
+                               const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs,
+                               const std::vector<std::pair<uint32_t, uint32_t>> ranges)
+{
+}
+
 INSTANTIATE_CLASS(AddOps)
 INSTANTIATE_CLASS(SubOps)
 INSTANTIATE_CLASS(MulOps)

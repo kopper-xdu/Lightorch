@@ -17,14 +17,15 @@ uint32_t compute_length(const std::vector<uint32_t> &shape)
 }
 
 template<typename Dtype>
-Tensor<Dtype>::Tensor(const std::vector<uint32_t> &shape, bool require_grad) :
+Tensor<Dtype>::Tensor(const std::vector<uint32_t> &shape, bool require_grad, bool alloc_mem) :
     shape_(shape), 
     require_grad_(require_grad),
     length_(compute_length(shape)),
     stride_(shape.size()),
     data_offset_(0)
 {
-    data_ = std::make_shared<Storage>(length_ * sizeof(Dtype));
+    if (alloc_mem)
+        data_ = std::make_shared<Storage>(length_ * sizeof(Dtype));
     if (require_grad_)
     {
         grad_ = std::make_shared<Tensor<Dtype>>(shape_, false);
@@ -80,6 +81,11 @@ Tensor<Dtype>::~Tensor()
 //     Tensor<Dtype> res(shape);
 //     SliceOps<Dtype>::compute({this, }, res);
 
+//     res.grad_fn_.ops_backward = std::bind(SliceOps<Dtype>::backward, 
+//                                      std::placeholders::_1, 
+//                                      std::placeholders::_2
+//                                      );
+
 //     res.grad_fn.inputs.push_back(this);
 //     res.grad_fn.ops_name = "Slice";
 //     res.grad_fn.ops_backward = &SliceOps<Dtype>::backward;
@@ -88,9 +94,39 @@ Tensor<Dtype>::~Tensor()
 // }
 
 template<typename Dtype>
-Dtype& Tensor<Dtype>::operator[](uint32_t idx) const
+Dtype Tensor<Dtype>::item() const
 {
-    return ((Dtype *) data_->start_ptr_)[idx];
+    return *(Dtype *) data_->start_ptr_;
+}
+
+template<typename Dtype>
+Tensor<Dtype> Tensor<Dtype>::operator[](uint32_t idx) const
+{
+    // return ((Dtype *) data_->start_ptr_)[idx];
+    auto rank = shape_.size();
+
+    std::vector<uint32_t> shape;
+    if (rank > 1)
+        shape = std::vector<uint32_t>(shape_.begin() + 1, shape_.end());
+    else
+        shape = std::vector<uint32_t>({1});
+
+    Tensor res(shape, true, false);
+    res.data_ = data_;
+    res.data_offset_ += idx * stride_[0];
+
+    return res;
+}
+
+template<typename Dtype>
+Tensor<Dtype> Tensor<Dtype>::operator=(Dtype val) const
+{
+    // memset(data_->start_ptr_, va)
+    Dtype* ptr = (Dtype*) data_->start_ptr_;
+    for (size_t i = 0; i < length_; ++i) {
+        memcpy(ptr + i, &val, sizeof(Dtype));
+    }
+    return *this;
 }
 
 template<typename Dtype>
@@ -186,38 +222,41 @@ Tensor<Dtype> Tensor<Dtype>::mean() const
     return res;
 }
 
-// template<typename Dtype>
-// std::ostream& operator<<(std::ostream& out, const Tensor<Dtype> &tensor)
-// {
-//     auto &shape = tensor.shape_;
-//     int rank = shape.size();
+template<typename Dtype>
+std::ostream& operator<<(std::ostream& out, const Tensor<Dtype> &tensor)
+{
+    auto &shape = tensor.shape_;
+    int rank = shape.size();
 
-//     if (rank == 0) {
-//         out << "tensor([])";
-//     } else if (rank == 1) {
-//         out << "[";
-//         for (int i = 0; i < shape[0]; i++) {
-//             out << tensor[i];
-//             if (i < shape[0] - 1) {
-//                 out << ", ";
-//             }
-//         }
-//         out << "]";
-//     } else {
-//         out << "[";
-//         for (int i = 0; i < shape[0]; i++) {
-//             Tensor<Dtype> slice = tensor[i];
-//             out << slice;
-//             if (i < shape[0] - 1) {
-//                 out << ", ";
-//             }
-//         }
-//         out << "]";
-//     }
+    if (rank == 0) {
+        out << "tensor([])";
+    } else if (rank == 1) {
+        out << "[ ";
+        for (int i = 0; i < shape[0]; i++) {
+            out << ((Dtype *) tensor.data_->start_ptr_)[i];
+            if (i < shape[0] - 1) {
+                out << ", ";
+            }
+        }
+        out << " ]";
+    } else {
+        out << "[ ";
+        for (int i = 0; i < shape[0]; i++) {
+            Tensor<Dtype> slice = tensor[i];
+            out << slice;
+            if (i < shape[0] - 1) {
+                out << ",\n";
+                if (rank > 2)
+                    out << '\n';
+            }
+        }
+        out << " ]";
+        
+    }
 
-//     return out;
-// }
+    return out;
+}
 
 INSTANTIATE_CLASS(Tensor)
-// template std::ostream& operator<<(std::ostream& out, const Tensor<float> &tensor);
-// template std::ostream& operator<<(std::ostream& out, const Tensor<double> &tensor);
+template std::ostream& operator<<(std::ostream& out, const Tensor<float> &tensor);
+template std::ostream& operator<<(std::ostream& out, const Tensor<double> &tensor);
