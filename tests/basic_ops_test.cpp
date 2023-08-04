@@ -23,7 +23,7 @@ TEST(TensorTest, BasicOpsTest) {
     EXPECT_EQ(h[0].item(), 15);
 }
 
-TEST(TensorTest, BwdOpsTest) {
+TEST(TensorTest, BasicBwdOpsTest) {
     Tensor<float> a({1});
     a = 5;
     Tensor<float> b({1});
@@ -45,13 +45,12 @@ TEST(TensorTest, BwdOpsTest) {
     EXPECT_EQ((*f.grad_)[0].item(), 1);
 }
 
-TEST(TensorTest, OutTest) {
-    Tensor<float> a({10});
-    a = 15;
-    Tensor<float> b({5, 5});
-    Tensor<float> c({2, 4, 2, 3});
+// TEST(TensorTest, OutTest) {
+//     Tensor<float> a({10}, {1, 2, 3, 4, 5, 6});
+//     Tensor<float> b({5, 5}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+//     Tensor<float> c({2, 4, 2, 3});
 
-    std::cout << a << '\n' << std::endl;
-    std::cout << b << '\n' << std::endl;
-    std::cout << c << '\n' << std::endl;
-}
+//     std::cout << a << '\n' << std::endl;
+//     std::cout << b << '\n' << std::endl;
+//     std::cout << c << '\n' << std::endl;
+// }

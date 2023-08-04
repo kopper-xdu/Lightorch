@@ -39,6 +39,18 @@ Tensor<Dtype>::Tensor(const std::vector<uint32_t> &shape, bool require_grad, boo
 }
 
 template<typename Dtype>
+Tensor<Dtype>::Tensor(const std::vector<uint32_t> &shape, const std::initializer_list<Dtype> &init_vals, bool require_grad, bool alloc_mem) :
+    Tensor(shape, require_grad, alloc_mem)
+{
+    auto ptr = (Dtype*) data_->start_ptr_;
+
+    int i = 0;
+    for (auto v : init_vals) {
+        ptr[i++] = v;
+    }
+}
+
+template<typename Dtype>
 void Tensor<Dtype>::backward()
 {
     auto ptr = (Dtype *) (grad_->data_->start_ptr_);
@@ -50,6 +62,42 @@ template<typename Dtype>
 Tensor<Dtype>::~Tensor()
 {
     // free(data);
+}
+
+template<typename Dtype>
+std::ostream& operator<<(std::ostream& out, const Tensor<Dtype> &tensor)
+{
+    auto &shape = tensor.shape_;
+    int rank = shape.size();
+
+    if (rank == 0) {
+        out << "tensor([])";
+    } else if (rank == 1) {
+        out << "[ ";
+        auto ptr = ((Dtype *) tensor.data_->start_ptr_) + tensor.data_offset_;
+        for (int i = 0; i < shape[0]; i++) {
+            out << ptr[i];
+            if (i < shape[0] - 1) {
+                out << ", ";
+            }
+        }
+        out << " ]";
+    } else {
+        out << "[ ";
+        for (int i = 0; i < shape[0]; i++) {
+            Tensor<Dtype> slice = tensor[i];
+            out << slice;
+            if (i < shape[0] - 1) {
+                out << ",\n";
+                if (rank > 2)
+                    out << '\n';
+            }
+        }
+        out << " ]";
+        
+    }
+
+    return out;
 }
 
 // template<typename Dtype>
@@ -223,39 +271,22 @@ Tensor<Dtype> Tensor<Dtype>::mean() const
 }
 
 template<typename Dtype>
-std::ostream& operator<<(std::ostream& out, const Tensor<Dtype> &tensor)
+Tensor<Dtype> Tensor<Dtype>::matMul(const Tensor &another) const
 {
-    auto &shape = tensor.shape_;
-    int rank = shape.size();
+    Tensor<Dtype> res({shape_[0], another.shape_[1]});
+    MatMulOps<Dtype>::compute({this, &another}, res);
 
-    if (rank == 0) {
-        out << "tensor([])";
-    } else if (rank == 1) {
-        out << "[ ";
-        for (int i = 0; i < shape[0]; i++) {
-            out << ((Dtype *) tensor.data_->start_ptr_)[i];
-            if (i < shape[0] - 1) {
-                out << ", ";
-            }
-        }
-        out << " ]";
-    } else {
-        out << "[ ";
-        for (int i = 0; i < shape[0]; i++) {
-            Tensor<Dtype> slice = tensor[i];
-            out << slice;
-            if (i < shape[0] - 1) {
-                out << ",\n";
-                if (rank > 2)
-                    out << '\n';
-            }
-        }
-        out << " ]";
-        
-    }
+    res.grad_fn_.ops_backward = std::bind(MatMulOps<Dtype>::backward, 
+                                     std::placeholders::_1,
+                                     std::placeholders::_2
+                                     );
+    res.grad_fn_.inputs.push_back(this);
+    res.grad_fn_.inputs.push_back(&another);
+    res.grad_fn_.ops_name = "MatMul";
 
-    return out;
+    return res;
 }
+
 
 INSTANTIATE_CLASS(Tensor)
 template std::ostream& operator<<(std::ostream& out, const Tensor<float> &tensor);

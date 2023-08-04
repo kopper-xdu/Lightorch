@@ -14,6 +14,7 @@ class Tensor
 {
 public:
     Tensor(const std::vector<uint32_t> &shape, bool require_grad = true, bool alloc_mem = true);
+    Tensor(const std::vector<uint32_t> &shape, const std::initializer_list<Dtype> &init_vals, bool require_grad = true, bool alloc_mem = true);
 
     // Tensor slice(const std::vector<std::pair<uint32_t, uint32_t>>& ranges) const;
     Dtype item() const;
@@ -24,6 +25,7 @@ public:
     Tensor operator*(const Tensor &another) const;
     Tensor operator/(const Tensor &another) const;
     Tensor mean() const;
+    Tensor matMul(const Tensor &another) const;
 
 
     void backward();

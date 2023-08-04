@@ -29,16 +29,17 @@ DECLARE_OPS(Sub, 2)
 DECLARE_OPS(Mul, 2)
 DECLARE_OPS(Div, 2)
 DECLARE_OPS(Mean, 1)
+DECLARE_OPS(MatMul, 2)
 
 
-template<typename Dtype>
-class SliceOps
-{
-public:
-    static void compute(const std::vector<const Tensor<Dtype> *> &inputs, \
-                        Tensor<Dtype> &out,
-                        const std::vector<std::pair<uint32_t, uint32_t>> &ranges);
-    static void backward(const std::vector<const Tensor<Dtype> *> &inputs,
-                         const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs,
-                         const std::vector<std::pair<uint32_t, uint32_t>> ranges);
-};
+// template<typename Dtype>
+// class SliceOps
+// {
+// public:
+//     static void compute(const std::vector<const Tensor<Dtype> *> &inputs, \
+//                         Tensor<Dtype> &out,
+//                         const std::vector<std::pair<uint32_t, uint32_t>> &ranges);
+//     static void backward(const std::vector<const Tensor<Dtype> *> &inputs,
+//                          const std::vector<std::shared_ptr<Tensor<Dtype>>> &outputs,
+//                          const std::vector<std::pair<uint32_t, uint32_t>> ranges);
+// };
